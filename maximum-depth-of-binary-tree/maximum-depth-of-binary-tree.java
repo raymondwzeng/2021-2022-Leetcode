@@ -15,23 +15,20 @@
  */
 class Solution {
     public int maxDepth(TreeNode root) {
-        //Maybe do an in-order traversal, modifying the max depth?
-        //We should do this recursively!
-        if(root == null) return 0;
-        int maxDepth = 1;
+        //Run a DFS.
+        if(root == null) return 0; //Okay, one exception.
+        int depth = 1; //Always 1 node between itself, no exceptions.
+        
+        int leftDepth = 1;
+        int rightDepth = 1;
+        
         if(root.left != null) {
-            int leftMaxDepth = maxDepth(root.left) + 1; //If we have a left node, we go there. We add 1 since any child of such a node has a depth of its depth + 1.
-            if(leftMaxDepth > maxDepth) {
-                maxDepth = leftMaxDepth;
-            }
-            
+            leftDepth = depth + maxDepth(root.left);
         }
+        
         if(root.right != null) {
-            int rightMaxDepth = maxDepth(root.right) + 1;
-            if(rightMaxDepth > maxDepth) {
-                maxDepth = rightMaxDepth;
-            }
+            rightDepth = depth + maxDepth(root.right);
         }
-        return maxDepth;
+        return Math.max(leftDepth, rightDepth);
     }
 }
