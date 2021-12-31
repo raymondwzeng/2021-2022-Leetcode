@@ -1,18 +1,20 @@
 class Solution {
     public int majorityElement(int[] nums) {
-        //Standard solution: Use a hashtable lol
-        //Edge case: 1 item in list (we're given that a majority element always exists)
-        HashMap<Integer, Integer> freqMap = new HashMap<Integer, Integer>();
-        for(int i = 0; i < nums.length; i++) {
-            if(freqMap.get(nums[i]) == null) {
-                freqMap.put(nums[i], 1);
+        //Simple solution, use a hashmap and see when we end up crossing the nums/2 length mark.
+        //Nonsimple solution, sort and count. Radix sort would be (maybe?) linear.
+        Arrays.sort(nums); //Stupid mistake 4: Sorting after setting up base numbers. Lol
+        int frequency = 1;
+        int lastNum = nums[0]; //We don't need to worry about an empty array, given in problem.
+        for(int i = 1; i < nums.length; i++) { //Error in first time submission: Starting at 0 (we already counted it!)
+            if(nums[i] == lastNum) {
+                frequency++;
+                if(frequency > nums.length/2) return lastNum;
             } else {
-                freqMap.put(nums[i], freqMap.get(nums[i]) + 1);
+                frequency = 1; //Error in second submission: Starting at 0...again. (Bruh)
+                lastNum = nums[i];
             }
-            if(freqMap.get(nums[i]) > nums.length/2) {
-                return nums[i];
-            } 
         }
-        return -1;
+        return lastNum; //Error in third submission: Using -1 as an error condition rather than the lastNum (as majority element will always exist.)
+        //Possibly O(n) + O(n), potentially O(nlogn) + O(n)
     }
 }
