@@ -14,21 +14,26 @@
  * }
  */
 class Solution {
-    public boolean isSameTree(TreeNode p, TreeNode q) { //Rewritten from #100
-        if(p == null) {
-            if(q == null) return true;
+    public boolean isSametree(TreeNode root, TreeNode subRoot) {
+        if(root == null) {
+            if(subRoot == null) return true;
             return false;
-        } else if (q == null) {
+        } else if (subRoot == null) {
             return false;
-        }
-        if(p.val != q.val) return false;
-        return (isSameTree(p.left, q.left) && isSameTree(p.right, q.right));
+        }//Same setup as previous problem
+        
+        if(root.val != subRoot.val) return false;
+        return (isSametree(root.left, subRoot.left) && isSametree(root.right, subRoot.right));
     }
     
     public boolean isSubtree(TreeNode root, TreeNode subRoot) {
-        if(subRoot == null) return true; //Null tree is subtree of any tree
-        if(root == null) return false; //Null tree is not a subtree of any tree except null tree (addressed by above)
-        if(isSameTree(root, subRoot)) return true;
-        return (isSubtree(root.left, subRoot) || isSubtree(root.right, subRoot));
+        if(subRoot == null) return true; //All trees contain the null tree as a subtree/subgraph.
+        if(root == null) return false; //If subRoot is not null, but the main tree is, we know it's false (null tree can not contain any other tree except itself.)
+        
+        if (isSametree(root, subRoot)) return true; //If we're dealing with the same tree, we're done.
+        return (isSubtree(root.right, subRoot) || isSubtree(root.left, subRoot)); //A tree can be a supertree if either of the subtrees (l or r) are the same tree as the target subtree.
+        
+        //O(n) runtime, assuming that each node fails to compare at the first steps. Then it will only iterate through the tree, comparing the whole subtree once.
+        //Error while redoing once - remember that we're only dealing with the subroot, comparing the tree from there. Subroot remains static.
     }
 }
