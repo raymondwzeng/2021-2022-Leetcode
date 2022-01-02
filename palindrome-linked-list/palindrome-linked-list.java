@@ -9,45 +9,36 @@
  * }
  */
 class Solution {
-    public ListNode reverseList(ListNode head) {
-        if(head == null) return null;
+    public ListNode getMiddleOfList(ListNode head) { //This takes O(n/2) time, because we're only iterating through technically half of the values
+        ListNode fastPointer = head;
+        ListNode slowPointer = head;
+        while(fastPointer != null && fastPointer.next != null) {
+            slowPointer = slowPointer.next;
+            fastPointer = fastPointer.next.next;
+        }
+        return slowPointer;
+    }
+    
+    public ListNode reverseLinkedList(ListNode head) { //This takes O(n) time, because we have to traverse the entire list to reverse them all
         ListNode runner = head;
         ListNode lastNode = null;
         while(runner != null) {
             ListNode temp = runner.next;
-            runner.next = lastNode; //Set next to lastNode, then lastNode to the runner to avoid self-cycling I believe.
+            runner.next = lastNode;
             lastNode = runner;
             runner = temp;
         }
         return lastNode;
     }
     
-    public ListNode findMiddle(ListNode head) {
-        if (head == null) return null;
-        ListNode slow = head;
-        ListNode fast = head;
-        while(fast != null && fast.next != null) {
-            slow = slow.next;
-            fast = fast.next.next;
-        }
-        return slow;
-    }
-    
-    public boolean isPalindrome(ListNode head) {
-        //Combination of other algorithms! (yay)
-        //We are guaranteed a head in this case, so no worries. Otherwise check & return, idk, true?
-        ListNode listMiddle = findMiddle(head);
-        ListNode reverseHead = reverseList(listMiddle);
-        ListNode runner = head;
-        while(runner != null && reverseHead != null) { //Since the other half is now reversed, it has a null point at the end.
-            if(runner.val != reverseHead.val) {
-                return false;
-            }
-            runner = runner.next;
-            reverseHead = reverseHead.next; //Whoops, forgot to increment the runners!
-        }
+    public boolean isPalindrome(ListNode head) { 
+        ListNode headOfSecondHalf = reverseLinkedList(getMiddleOfList(head));
+        ListNode forwardRunner = head;
+        while(forwardRunner != null && headOfSecondHalf != null) { //This takes O(n/2) time, because we're iterating through both halves at the same time
+            if(forwardRunner.val != headOfSecondHalf.val) return false;
+            forwardRunner = forwardRunner.next;
+            headOfSecondHalf = headOfSecondHalf.next;
+        } //In total, we take O(n) + O(n) + O(n/2) = O(3/2n) time, still linear.
         return true;
-        
-        //Runtime: Given m = n/2, O(m) to find middle, O(m) to reverse the list, and O(m) to check. So O(3m), or O([3/2]n), or linear.
     }
 }
