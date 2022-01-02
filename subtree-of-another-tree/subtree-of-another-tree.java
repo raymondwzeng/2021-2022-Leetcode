@@ -14,26 +14,22 @@
  * }
  */
 class Solution {
-    public boolean isSametree(TreeNode root, TreeNode subRoot) {
-        if(root == null) {
-            if(subRoot == null) return true;
+    public boolean isSameTree(TreeNode root, TreeNode otherRoot) { //This is an O(m) operation, where m is the number of nodes in the subtrees.
+        if(otherRoot == null) {
+            if(root == null) return true;
             return false;
-        } else if (subRoot == null) {
+        } else if(root == null) {
             return false;
-        }//Same setup as previous problem
-        
-        if(root.val != subRoot.val) return false;
-        return (isSametree(root.left, subRoot.left) && isSametree(root.right, subRoot.right));
+        }
+        if(root.val != otherRoot.val) return false;
+        return(isSameTree(root.left, otherRoot.left) && isSameTree(root.right, otherRoot.right));
     }
     
-    public boolean isSubtree(TreeNode root, TreeNode subRoot) {
-        if(subRoot == null) return true; //All trees contain the null tree as a subtree/subgraph.
-        if(root == null) return false; //If subRoot is not null, but the main tree is, we know it's false (null tree can not contain any other tree except itself.)
-        
-        if (isSametree(root, subRoot)) return true; //If we're dealing with the same tree, we're done.
-        return (isSubtree(root.right, subRoot) || isSubtree(root.left, subRoot)); //A tree can be a supertree if either of the subtrees (l or r) are the same tree as the target subtree.
-        
-        //O(n) runtime, assuming that each node fails to compare at the first steps. Then it will only iterate through the tree, comparing the whole subtree once.
-        //Error while redoing once - remember that we're only dealing with the subroot, comparing the tree from there. Subroot remains static.
+    public boolean isSubtree(TreeNode root, TreeNode subRoot) { //This is an O(n) operation, where n is the number of nodes in the main trees.
+        if(subRoot == null) return true;
+        if(root == null) return false;
+        if(isSameTree(root, subRoot) == true) return true;
+        return(isSubtree(root.left, subRoot) || isSubtree(root.right, subRoot));
+        //Ultimately this is an O(nm) operation.
     }
 }
