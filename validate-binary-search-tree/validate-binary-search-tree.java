@@ -14,43 +14,36 @@
  * }
  */
 class Solution {
-    public TreeNode findLeast(TreeNode root) {
-        TreeNode leastNode = root;
-        while(leastNode.left != null) {
-            leastNode = leastNode.left;
-        }
-        return leastNode;
-    } 
-    
-    public TreeNode findGreatest(TreeNode root) {
-        TreeNode greatestNode = root;
-        while(greatestNode.right != null) {
-            greatestNode = greatestNode.right;
-        }
-        return greatestNode;
-    }
-    
     public boolean isValidBST(TreeNode root) {
-        //This problem seems to lend itself towards recursion, where we check the left and right nodes, then the left and right subtrees
-        //The main problem comes from the idea of example 2, where *technically* the left and right are BSTs, but the entire tree is not.
-        //Naive solution: Check the root left, right, and left + right subtrees
-        //We don't need to account for null due to the conditions given
-        //So traversing the right and left subtrees for the least/greatest takes O(logN) operations each time, and we perform this
-        //on each node. Thus we have an O(nlogn) runtime?
-        boolean leftSubtreeValid = true;
-        boolean rightSubtreeValid = true;
-        if(root.left != null) {
-            if(root.left.val >= root.val) return false;
-            leftSubtreeValid = isValidBST(root.left);
-            TreeNode greatestOfLeft = findGreatest(root.left);
-            if(greatestOfLeft.val >= root.val) return false; 
+        //Our previous solution ran in O(nlogn) time, I believe.
+        //The main driver of the longer work time was due to searching for the greatest of left, least of right, which
+        //required a search in O(logn) time each time.
+        //What if we found a way to incorporate that into our search?
+        //So we'd need an iterative solution, or maybe a recursive one still works?
+        //Start by stacking right, then stack node, then stack left.
+        //When we start popping, we should get a proper order.
+        
+        //But this solution is a bit better than the other. Iterating through in-order is O(n), then iterating through the list is O(n),
+        //but we use a space of O(n) as well. tradeoffs!
+        Stack<TreeNode> inOrder = new Stack<>();
+        List<TreeNode> finalList = new ArrayList<>();
+        
+        while(root != null || !inOrder.isEmpty()) { //Yoinked from LeetCode solutions, gotta practice this.
+            while(root != null) {
+                inOrder.push(root);
+                root = root.left;
+            }
+            root = inOrder.pop();
+            finalList.add(root);
+            root = root.right;
         }
-        if(root.right != null) {
-            if(root.right.val <= root.val) return false;
-            rightSubtreeValid = isValidBST(root.right);
-            TreeNode leastOfRight = findLeast(root.right);
-            if(leastOfRight.val <= root.val) return false;
+        
+        for(int i = 1; i < finalList.size(); i++) {
+            if(finalList.get(i-1).val >= finalList.get(i).val) {
+                return false;
+            }
         }
-        return (leftSubtreeValid && rightSubtreeValid);
+        
+        return true;
     }
 }
