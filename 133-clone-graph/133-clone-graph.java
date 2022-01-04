@@ -98,20 +98,34 @@ class Solution {
                 if(original.val == 1) returnNode = clone;
                 cloneMap.put(original, clone);
                 for(int i = 0; i < original.neighbors.size(); i++) {
+                    //Another possible optimization - maybe check if the clone exists + no neighbors?
                     BFS.add(original.neighbors.get(i)); //Add the rest to be made in the BFS order.
                 }
+            } else {
+                if(cloneMap.get(original).neighbors.size() == 0) {
+                    for(int i = 0; i < original.neighbors.size(); i++) {
+                    Node cloneNeighbor = cloneMap.get(original.neighbors.get(i));
+                    if(cloneNeighbor != null) { //If the other node already exists...
+                        cloneMap.get(original).neighbors.add(cloneNeighbor);
+                        if(cloneNeighbor.neighbors.size() == 0) { //Weird edge case where a node with degree 1 won't be linked.
+                            BFS.add(original.neighbors.get(i));
+                        }
+                    }
+                }
+                }
+
             } //We can't do an else and connect the links, because then we'd run into the issue of potentially nulls being added.
             //Unless...we don't mind? We can try that in a bit.
         }
         
-        for(Map.Entry<Node, Node> entry : cloneMap.entrySet()) { //Iterate between every item in the entry
-            Node original = entry.getKey();
-            Node clone = entry.getValue();
+//         for(Map.Entry<Node, Node> entry : cloneMap.entrySet()) { //Iterate between every item in the entry
+//             Node original = entry.getKey();
+//             Node clone = entry.getValue();
             
-            for(int i = 0; i < original.neighbors.size(); i++) {
-                clone.neighbors.add(cloneMap.get(original.neighbors.get(i))); //Link the actual nodes.
-            }
-        }
+//             for(int i = 0; i < original.neighbors.size(); i++) {
+//                 clone.neighbors.add(cloneMap.get(original.neighbors.get(i))); //Link the actual nodes.
+//             }
+//         }
         
         //Since we are running BFS once, then going through each node again essentially, this algorithm runs in O(n^2) time I believe.
         
