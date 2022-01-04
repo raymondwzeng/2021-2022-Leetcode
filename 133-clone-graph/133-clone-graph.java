@@ -109,6 +109,8 @@ class Solution {
                         cloneMap.get(original).neighbors.add(cloneNeighbor);
                         if(cloneNeighbor.neighbors.size() == 0) { //Weird edge case where a node with degree 1 won't be linked.
                             BFS.add(original.neighbors.get(i));
+                            //This seems to be actually slower than using the other method. Not sure exactly why - but maybe a case where
+                            //we're re-adding nodes with 0 neighbors more often than just iterating over the previous?
                         }
                     }
                 }
