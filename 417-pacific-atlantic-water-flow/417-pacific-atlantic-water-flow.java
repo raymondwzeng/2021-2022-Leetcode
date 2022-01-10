@@ -8,6 +8,13 @@ class Solution {
         //[0,0] is at the top left, and increases towards bottom-right.
         //What should we prioritize here? Do we want to go deep down one path, or do we want to spread out our search?
         //I think for now, spreading out in all (possible) directions is going to be my choice, since we may be able to spend less time down a wrong path.
+        //Since we visit each node, by default we're running an O(m*n) solution for just traversal.
+        //Next, since we run a BFS at each node, we could theoretically reach a worst case scenario of O(m*n) internally...right?
+        //So our entire algorithm runs in O(mn(mn)) or O((mn)^2) time, I believe.
+        //How can we speed this up?
+        //Well, we can't just stop a path from being explored simply because of one given direction. That would block off potential options.
+        //Maybe we could try doing something dynamic-programming-ish, where we give each node a "canReachPacific" and "canReachAtlantic"?
+        //Or maybe DFS is just faster?
         List<List<Integer>> result = new LinkedList<List<Integer>>();
         for(int row = 0; row < heights.length; row++) {
             for(int col = 0; col < heights[row].length; col++) {
