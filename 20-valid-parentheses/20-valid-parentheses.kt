@@ -1,12 +1,13 @@
 class Solution {
     fun isValid(s: String): Boolean {
-        var stack = ArrayDeque<Char>()
-        for(element in s) {
-            when(element as Char) {
-                '(', '[', '{' -> stack.addLast(element) //Found out about this from another solution - you can stack by commas!
-                ')' -> if (stack.isEmpty() || stack.removeLast() != '(') return false
-                '}' -> if (stack.isEmpty() || stack.removeLast() != '{') return false
-                ']' -> if (stack.isEmpty() || stack.removeLast() != '[') return false
+        //Approach: Use a stack, push open and pop closed paren
+        val stack = mutableListOf<Char>()
+        s.forEach{ char ->
+            when (char) {
+                '(' , '{' , '[' -> stack.add(0, char) //Add to front
+                ')' -> if(stack.elementAtOrNull(0) != '(') return false else stack.removeAt(0)
+                ']' -> if(stack.elementAtOrNull(0) != '[') return false else stack.removeAt(0)
+                '}' -> if(stack.elementAtOrNull(0) != '{') return false else stack.removeAt(0)
             }
         }
         return stack.isEmpty()
