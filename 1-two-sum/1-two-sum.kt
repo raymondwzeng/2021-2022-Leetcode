@@ -1,12 +1,17 @@
 class Solution {
     fun twoSum(nums: IntArray, target: Int): IntArray {
-        var set = mutableMapOf<Int, Int>()
-        nums.forEachIndexed { index, num ->
-            if(set.contains(target - num)) {
-                return intArrayOf(index, set.get(target - num) as Int)
+        //Approach: Create a map of seen numbers.
+        val seen = mutableMapOf<Number, Integer>()
+        var result = IntArray(2)
+        nums.forEachIndexed{ index, num -> 
+            if(seen.containsKey(target - num)) {
+                result[0] = index
+                result[1] = seen.get(target - num) as Int //Kind of ugly. Maybe theres a better way?
+                return result
+            } else {
+                seen.put(num, index as Integer) //Kind of ugly. Maybe theres a better way?
             }
-            set.put(num, index);
         }
-        return intArrayOf(-1)
+        return result
     }
 }
