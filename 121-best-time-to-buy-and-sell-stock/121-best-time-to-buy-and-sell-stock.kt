@@ -1,29 +1,16 @@
 class Solution {
     fun maxProfit(prices: IntArray): Int {
-        //This is a dynamic programming-ish problem.
-        /*
-        Overlapping subproblems - we can either buy
-        day 1, day 2, etc. or not buy at all.
-        We can sell on day 2, day 3, etc.
-        
-        Optimal substructure - doesn't really apply in this case,
-        since we only have 1 solution that doesn't "build"
-        on any previous solution, but something to perhaps
-        keep in mind for future BTBSS
-        */
-        var maxProfit = 0
-        var firstIndex : Int? = prices.firstOrNull()
-        firstIndex?.let { //Do only if array is not empty (that is, first index not null)
-            var lowestSoFar : Int = firstIndex
-            var profitArray = mutableListOf<Int>(maxProfit) //Track profits
-            prices.forEachIndexed { index, element ->
-                if(index > 0) { //We only want to start on the second instance
-                    profitArray.add(Math.max(profitArray.get(index-1), element - lowestSoFar))
-                    if(element < lowestSoFar) lowestSoFar = element
-                }
-            }    
-            return profitArray.last()
-        }
-        return maxProfit
+        //This is a dynamic programming kind of problem, as evidenced by the fact that we have overlapping subproblems (profit depends on when you bought in) and the optimal substructure (our best profits will exist across the entire problem.)
+        //Start by declaring a current max array, set to 0, equal in size to our input.
+        var max = 0 //Minor space + runtime optimization - we don't need the information from all days, only the most recent one.
+        var localMin = prices[0] //Our lowest value so far, which we will use to check the profit.
+        prices.forEach { value ->
+            if(max < value - localMin) {
+                max = value - localMin
+            }
+            if(value < localMin) localMin = value //Set the new low for future items
+                //Optimal substructure here: If a new min exists, then any value after would achieve a higher profit by buying now and selling later vs. buying before and selling then.
+            }
+        return max
     }
 }
