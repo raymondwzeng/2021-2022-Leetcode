@@ -1,12 +1,12 @@
 class Solution {
     fun isPalindrome(s: String): Boolean {
+        //We should first start by formatting the text so that it does not contain any non-alphanumeric chars.
+        //Should be just some linear scans.
+        var str = s.toLowerCase().filter { it.isLetterOrDigit() }
         var left = 0
-        var right = s.length - 1
-        val alphaNumeric = Regex("[a-zA-Z0-9]")
-        while(left < right) {
-            while(left < s.length && !s.substring(left..left).matches(alphaNumeric)) left++
-            while(right > -1 && !s.substring(right..right).matches(alphaNumeric)) right--
-            if(left < right && s.get(left).toLowerCase() != s.get(right).toLowerCase()) return false
+        var right = str.count() - 1
+        while(left < right) { //Sort of linear (technically half) scan to check matching letters
+            if(str.get(left) != str.get(right)) return false
             left++
             right--
         }
