@@ -1,32 +1,24 @@
 class Solution {
     fun isAnagram(s: String, t: String): Boolean {
-        var sourceMap = mutableMapOf<Char, Int>();
-        var targetMap = mutableMapOf<Char, Int>();
-        s.forEach{element ->
-            if(sourceMap.contains(element)) {
-                sourceMap.put(element, sourceMap.get(element)!!.plus(1))
-            } else {
-                sourceMap.put(element, 0)
-            }
+        //The straightforward approach is to create two maps of char -> int pairs based on frequency, then simply compare their values.
+        val sMap = mutableMapOf<Char, Int>()
+        val tMap = mutableMapOf<Char, Int>()
+        s.forEach { character -> 
+            sMap.put(character, sMap.getOrDefault(character, 0) + 1)
         }
-        t.forEach{element ->
-            if(targetMap.contains(element)) {
-                targetMap.put(element, targetMap.get(element)!!.plus(1))
-            } else {
-                targetMap.put(element, 0)
-            }
+        t.forEach { character -> 
+            tMap.put(character, tMap.getOrDefault(character, 0) + 1)
         }
         
-        //Iterate through the target map to make sure that nothing is missing.
-        targetMap.forEach{element ->
-            if(!sourceMap.contains(element.key) || sourceMap.get(element.key) != element.value) return false
+        //Then iterate through both of them to confirm that the frequencies are the exact same
+        var isSame = true
+        sMap.forEach { character, frequency ->
+            if(tMap.getOrDefault(character, -1) != frequency) isSame = false //For some reason, can't return here labeled or not. Maybe just a LeetCode thing?
+        }
+        tMap.forEach { character, frequency ->
+            if(sMap.getOrDefault(character, -1) != frequency) isSame = false
         }
         
-        //Iterate through the source map to make sure it doesn't have anything extra
-        sourceMap.forEach{element ->
-            if(!targetMap.contains(element.key) || targetMap.get(element.key) != element.value) return false
-        }
-        
-        return true
+        return isSame
     }
 }
