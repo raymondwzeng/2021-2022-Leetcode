@@ -10,25 +10,14 @@
  */
 class Solution {
     fun invertTree(root: TreeNode?): TreeNode? {
-        //The weird kicker here is that when we invert the binary tree, the children don't change, but are rather swapped. 
-        //This one approach that we could do is a level-order traversal and reversal, in which we add the root, swap their children and add them to the next stack over.
+        //Attempting some bastardized DFS recursive method
+        //This works because we just end up swapping the leaves, then working our way up, basically backwards vs the first solution.
         if(root == null) return null
-        val rootStack = listOf(root)
-        val stack: MutableList<List<TreeNode>> = mutableListOf<List<TreeNode>>(rootStack)
-        while(!stack.isEmpty()) {
-            val layer = stack.get(0)
-            //Get the first list in the list of lists
-            val nextLayerList = mutableListOf<TreeNode>()
-            layer.forEach { node ->
-                val temp = node.left
-                node.left = node.right
-                node.right = temp
-                if(node.left != null) nextLayerList.add(node.left)
-                if(node.right != null) nextLayerList.add(node.right)
-            }
-            if(!nextLayerList.isEmpty()) stack.add(nextLayerList)
-            stack.removeAt(0)
-        }
+        if(root.left != null) invertTree(root.left)
+        if(root.right != null) invertTree(root.right)
+        val temp = root.left
+        root.left = root.right
+        root.right = temp
         return root
     }
 }
