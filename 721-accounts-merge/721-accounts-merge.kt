@@ -1,76 +1,83 @@
 class Solution {
+    
     fun accountsMerge(accounts: List<List<String>>): List<List<String>> {
-        /*
-            The main key: If two lists share a common email, then the two lists should be merged.
-            Otherwise, do not merge them.
-            
-            This is probably not an merge intervals type problem
-            
-            Hashmap by name, with key-value name-list<set<emails>>
-            For each name within the hashmap, if there exists more than 1 list of emails, then we need to check them for a merge.
-            *Considering that we need to sort the emails anyways, we might as well do that now. -> O(eloge) where e = # of emails
-            
-            -> Maybe we could perform a binary search for any intersection? -> O(loge), and since we do it for each email, O(eloge)
-            
-            We could also consider using a set for this..? -> O(1) retrieval for .contains()
-            Assume that all emails within an account are unique
-                -> Store each block of emails within a set, rather than a list
-                -> Retrieval/checking for matches lowered to O(n * e * a) where n is the number of accounts with the same name
-                    -What happens if we do find a match? -> Produce a new set which is the union of both sets, and then remove the individuals
-                    -We know that a set maintains an order based upon insertion, we know that if we have a match, then we would likely insert additional items, and that any item that exists before would have been matched already
-                -> Produce a new list which is the set .toList(), sorted, and the name of the account holder -> O(n * eloge * a), where a is the number of accounts
-                
-            Space: 
-                Store each account within a hashmap -> O(a)
-                Store each email list per account -> O(a * n)
-                Store each email within each email list -> O(a * n * e)
-        */
-        
-        val nameMap = mutableMapOf<String, MutableList<Set<String>>>()
-        
-        for(nameEntry: List<String> in accounts) {
-            if(nameMap.get(nameEntry[0]) == null) {
-                nameMap.put(nameEntry[0], mutableListOf(nameEntry.drop(1).toSet()))
-            } else {
-                val nameList = nameMap.get(nameEntry[0]) as MutableList<Set<String>>
-                nameList.add(nameEntry.drop(1).toSet())
-            }
-        }
-        
-        nameMap.forEach { entry ->
-            var index = 0
-            while(index < entry.value.size - 1) {
-                var innerIndex = index + 1
-                var hasFolded = false
-                while(innerIndex < entry.value.size && !hasFolded) {
-                    val currentEmailBlock = entry.value[index]
-                    // println(currentEmailBlock)
-                    if(currentEmailBlock.intersect(entry.value[innerIndex]).isNotEmpty()) {
-                        // println("Unioning ${currentEmailBlock} and ${entry.value[innerIndex]}")
-                        entry.value[innerIndex] = currentEmailBlock.union(entry.value[innerIndex])
-                        entry.value.removeAt(index)
-                        hasFolded = true
-                        index--
-                    }
-                    innerIndex++
-                }
-                // println("${entry.value}")
-                index++
-            }
-            // println(entry)
-        }
+        //Union find via hashing the root, and hashing the owner as well
+        val rootMap = mutableMapOf<String, String>() //Key: Node name, Value: Parent
+        val ownerMap = mutableMapOf<String, String>() //Key: Node name, Value: Account holder
         
         val returnList = mutableListOf<List<String>>()
+        val emailChainMap = mutableMapOf<String, MutableSet<String>>() //Remark: We use a set because it allows for duplicate checking natively without additional work on our end.
         
-        nameMap.forEach { entry -> 
-            entry.value.forEach { emailSet : Set<String> ->
-                val listOfEmails = emailSet.toMutableList()
-                listOfEmails.sort()
-                val listWithEmails = listOf(entry.key) + listOfEmails
-                returnList.add(listWithEmails)
+        //First loop, add all of the items into the root and owner maps.
+        accounts.forEach { account ->
+            account.forEachIndexed { index, emailAddress ->
+                if(index > 0) { //Skip the original node, which is the owner.
+                    rootMap.put(emailAddress, emailAddress) //Each node in UF starts as its own root
+                    ownerMap.put(emailAddress, account[0]) //We know that the 0th index of each account is the owner's name
+                }
             }
+        }
+        
+        //Second loop, unions all of the email addresses such that if a root between two emails is the same, then they should be part of the same list.
+        accounts.forEach { account ->
+            account.forEachIndexed { index, emailAddress ->
+                if(index > 0 && index < account.size - 1) {
+                    unionRoots(emailAddress, account[index + 1], rootMap)
+                }
+            }
+        }
+        
+        //Third loop, produces the set of items in order to carry out the last step. This is necessary(?) because there is no guarantee that we will have contiguous emails to add into a list. May not be necessary if we change the data structure to something more optimal.
+        accounts.forEach { account ->
+            account.forEachIndexed { index, emailAddress ->
+                if(index > 0) { //Null check for type inference String? -> String
+                    val addressRoot = findRootAndCompress(emailAddress, rootMap)
+                    if(addressRoot == emailAddress) { //Create a new set, which will be put into yet another map for quick reference
+                        if(emailChainMap.get(addressRoot) == null) emailChainMap.put(emailAddress, mutableSetOf<String>())
+                    } else { //Insert the item into the set headed by the root email address, or create one
+                        emailChainMap.getOrPut(addressRoot, {mutableSetOf<String>()}).add(emailAddress)
+                    }
+                }
+            }
+        }
+
+        //Final loop, produces the list and sorts before adding the owner.
+        emailChainMap.forEach { emailChainEntry ->
+            //The key is the root, the values is a set of other emails.
+            val emailList = emailChainEntry.value.toMutableList()
+            emailList.add(emailChainEntry.key)
+            emailList.sort()
+            if(ownerMap.get(emailChainEntry.key) != null) emailList.add(0, ownerMap.get(emailChainEntry.key) as String) //Multiple checks for Kotlin
+            returnList.add(emailList)
         }
         
         return returnList
+    }
+    
+    /**
+    *   Finds the root of the emails, and unions them together by setting the parent of one to the other.
+    */
+    fun unionRoots(firstEmail: String, secondEmail: String, map: MutableMap<String, String>) {
+        val firstRoot = findRootAndCompress(firstEmail, map)
+        val secondRoot = findRootAndCompress(secondEmail, map)
+        if(firstRoot == secondRoot) return //No need to do anything if the roots are the same
+        map.put(firstRoot, secondRoot) //Could also consider the rank of each in a future iteration
+    }
+    
+    /**
+    *   Takes in a value and returns its root. May be the original node. Compresses everything in between for runtime.
+    */
+    fun findRootAndCompress(email: String, map: MutableMap<String, String>): String {
+        val ancestors = mutableListOf<String>()
+        var parent = email
+        while(map.get(parent) != parent && map.get(parent) != null) {
+            val newParent = map.get(parent) as String //Kotlin doesn't seem to like this
+            ancestors.add(newParent) 
+            parent = newParent
+        }
+        ancestors.forEach { ancestor ->
+            map.put(ancestor, parent) //Parent should be the root at this point
+        }
+        return parent //Return the most recent parent, which should be the root as its value in rootMap is itself
     }
 }
