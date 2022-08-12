@@ -40,16 +40,15 @@ class Solution {
             O(mn) time, with the same amount of space
         */
         if(m == 1 || n == 1) return 1
-        val dp = Array<IntArray>(m + 1) { IntArray(n + 1){0} } //You need an extra row and column because of 0 indexing, you buffoon >:(
+        val dp = Array<IntArray>(m) { IntArray(n){1} } //You need an extra row and column because of 0 indexing, you buffoon >:(
         dp.forEachIndexed { rowIndex, row ->
             row.forEachIndexed { colIndex, value ->
                 dp[rowIndex][colIndex] = when {
-                    rowIndex == 0 || colIndex == 0 -> 0
-                    rowIndex == 1 || colIndex == 1 -> 1
+                    rowIndex == 0 || colIndex == 0 -> 1
                     else -> dp[rowIndex][colIndex - 1] + dp[rowIndex - 1][colIndex]
                 }
             }
         }
-        return dp[m][n]
+        return dp[m - 1][n - 1]
     }
 }
