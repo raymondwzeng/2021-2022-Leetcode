@@ -14,7 +14,6 @@ class Solution {
     }   
     
     fun solve(partialCandidate: String, sourceList: List<List<Char>>, listIndex: Int, charIndex: Int, solutionSet: MutableList<String>, targetLength: Int) {
-        if(listIndex >= sourceList.size || charIndex >= sourceList[listIndex].size) return
         // println("Current candidate: $partialCandidate")
         // println("New character: ${sourceList[listIndex][charIndex]}")
         val newCandidate = partialCandidate + sourceList[listIndex][charIndex]
@@ -22,9 +21,9 @@ class Solution {
             solutionSet.add(newCandidate)
             // println("New finished candidate: $newCandidate")
         } else {
-            solve(newCandidate, sourceList, listIndex + 1, 0, solutionSet, targetLength)
+            if(listIndex + 1 < sourceList.size) solve(newCandidate, sourceList, listIndex + 1, 0, solutionSet, targetLength)
         }
-        solve(newCandidate.dropLast(1), sourceList, listIndex, charIndex + 1, solutionSet, targetLength)
+        if(charIndex + 1 < sourceList[listIndex].size) solve(newCandidate.dropLast(1), sourceList, listIndex, charIndex + 1, solutionSet, targetLength)
     }
     
     fun letterCombinations(digits: String): List<String> {
@@ -64,6 +63,7 @@ class Solution {
             ["a", "b", "c"]
             ["ad", "bd", "cd", "ae", "be", "ce", "af", "bf", "cf"]
         */
+        if(digits.length == 0) return emptyList()
         val listOfSources = mutableListOf<List<Char>>()
         val listOfCandidates = mutableListOf<String>()
         
