@@ -30,14 +30,16 @@ class Solution {
              O(n) space
         */
         if(nums.size == 1) return nums[0]
-        val moneyEarned = IntArray(nums.size) { index -> nums[index] }
+        val moneyEarned = IntArray(nums.size)
         
         nums.forEachIndexed { index, num ->
             for(i in index..nums.size - 1) {
                 if(i - 2 >= 0) {
                     moneyEarned[i] = maxOf(moneyEarned[i - 2] + nums[i], moneyEarned[i - 1])
                 } else if (i - 1 >= 0) {
-                    moneyEarned[i] = maxOf(moneyEarned[i - 1], moneyEarned[i])
+                    moneyEarned[i] = maxOf(moneyEarned[i - 1], nums[i])
+                } else {
+                    moneyEarned[i] = nums[i]
                 }
             }
         }
