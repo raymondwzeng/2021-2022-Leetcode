@@ -16,13 +16,13 @@ class Solution {
             For each node group within the chain, create a list of the values and return -> O(n)
         */
         if(strs.size == 1) return listOf(listOf(strs[0]))
-        val chains = mutableMapOf<Map<Char, Int>, MutableList<String>>()
+        val chains = mutableMapOf<Map<Char, Int>, LinkedList<String>>()
         strs.forEach { string: String -> //Build
             val freqMap = mutableMapOf<Char, Int>()
             string.forEach { char ->
                 freqMap.put(char, freqMap.getOrPut(char, {0}) + 1) 
             }
-            val chainList = chains.getOrPut(freqMap, {mutableListOf<String>()})
+            val chainList = chains.getOrPut(freqMap, {LinkedList<String>()})
             chainList.add(string)
         }
 
