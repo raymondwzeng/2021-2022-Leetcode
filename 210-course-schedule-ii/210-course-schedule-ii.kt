@@ -18,9 +18,13 @@ class Solution {
                 -> Would mainly help if the # edges on average << # nodes, since # edges <= (# nodes - 1)^2
         */
         val inDegree = Array<MutableSet<Int>>(numCourses) {mutableSetOf<Int>()}
+        val outDegree = Array<MutableList<Int>>(numCourses) {mutableListOf<Int>()}
+        
         prerequisites.forEach { pair ->
-            val set = inDegree.get(pair[0]) as MutableSet<Int>
-            set.add(pair[1])
+            val inSet = inDegree.get(pair[0]) as MutableSet<Int>
+            val outSet = outDegree.get(pair[1]) as MutableList<Int>
+            inSet.add(pair[1])
+            outSet.add(pair[0])
         }
         
         val returnSet = mutableSetOf<Int>()
@@ -34,13 +38,11 @@ class Solution {
         
         while(!queue.isEmpty()) {
             val front = queue.poll()
-            for(index in 0..numCourses - 1) {
-                if(inDegree[index].contains(front)) {
-                    inDegree[index].remove(front)
-                    if(inDegree[index].isEmpty() && !returnSet.contains(index)) {
-                        queue.add(index)
-                        returnSet.add(index)
-                    }
+            outDegree[front].forEach { course ->
+               inDegree[course].remove(front) 
+                if(inDegree[course].isEmpty() && !returnSet.contains(course)) {
+                    queue.add(course)
+                    returnSet.add(course)
                 }
             }
         }
