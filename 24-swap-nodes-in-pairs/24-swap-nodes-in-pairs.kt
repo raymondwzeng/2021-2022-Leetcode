@@ -39,15 +39,12 @@ class Solution {
         var newHead = head
         var regular = head
         var fast = head?.next
-        // var slow: ListNode? = null //Slow is the tail of our previous pair, we need this so that we can set the correct next reference to the head of the next pair.
         
         while(fast != null) {
             val coldReference = fast?.next
             fast?.next = regular //Reverse the list on a pair level
             regular?.next = if(coldReference != null && coldReference.next == null) coldReference else coldReference?.next
-            // if(slow != null) slow.next = fast
             if(regular == head) newHead = fast //Update the head if needed, should only happen once
-            // slow = regular
             regular = coldReference //Update the pointers
             fast = coldReference?.next
         }
