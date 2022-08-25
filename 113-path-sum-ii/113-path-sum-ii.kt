@@ -9,18 +9,29 @@
  * }
  */
 class Solution {
-    fun pathSum(root: TreeNode?, targetSum: Int, currentPath: List<Int>): List<List<Int>> {
+    fun pathSum(root: TreeNode?, targetSum: Int, currentPath: LinkedList<Int>): List<List<Int>> {
         if(root == null) return emptyList<List<Int>>()
         if(root.left == null && root.right == null) { //Leaf node
-            if(root.`val` == targetSum) return listOf<List<Int>>(currentPath + root.`val`) else return emptyList<List<Int>>()
+            if(root.`val` == targetSum) {
+                val newList = mutableListOf<Int>()
+                currentPath.add(root.`val`)
+                currentPath.forEach { item -> newList.add(item) }
+                return listOf<List<Int>>(newList) 
+            } else {
+                return emptyList<List<Int>>()
+            }
         }
         val returnList = mutableListOf<List<Int>>()
         if(root.left != null) {
-            val leftResult = pathSum(root.left, targetSum - root.`val`, currentPath + root.`val`)
+            val leftInput = LinkedList<Int>(currentPath)
+            leftInput.add(root.`val`)
+            val leftResult = pathSum(root.left, targetSum - root.`val`, leftInput)
             if(leftResult.isNotEmpty()) leftResult.forEach { list -> returnList.add(list) }
         }
         if(root.right != null) {
-            val rightResult = pathSum(root.right, targetSum - root.`val`, currentPath + root.`val`)
+            val rightInput = LinkedList<Int>(currentPath)
+            rightInput.add(root.`val`)
+            val rightResult = pathSum(root.right, targetSum - root.`val`, rightInput)
             if(rightResult.isNotEmpty()) rightResult.forEach { list -> returnList.add(list) }
         }
         return returnList
@@ -61,6 +72,6 @@ class Solution {
                         - Recurse on 5 with target 5, current path [5, 8, 4] -> Returns [5, 8, 4] + [5] -> Returns up
                         - Recurse on 1 with target 5 -> Returns empty 1 is leaf != 5
         */
-        return pathSum(root, targetSum, emptyList<Int>())
+        return pathSum(root, targetSum, LinkedList<Int>())
     }
 }
