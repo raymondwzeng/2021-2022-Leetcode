@@ -66,6 +66,7 @@ class Solution {
             }
             // println(freqMap)
             left++
+            if(right == s.length - 1) return maxLength
         }
         return maxLength
     }
