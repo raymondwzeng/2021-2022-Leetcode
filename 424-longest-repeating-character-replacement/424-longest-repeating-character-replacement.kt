@@ -34,13 +34,15 @@ class Solution {
             var charactersAdded = 1
             while(charactersAdded > 0) { //While we can grow the sliding window, either from dom char, or transforming others
                 var charactersLeftToTransform = k - ((right - left + 1) - (freqMap.get(dominantChar) ?: 0))
-                // println("Left: $left, Right: $right")
+                println("Left: $left, Right: $right")
+                // println("Chars left to transform: $charactersLeftToTransform")
                 charactersAdded = 0
-                while(right < s.length - 1 && s[right + 1] == dominantChar) { //Grow the sliding window to as much as possible using the dominant char
-                    right++
-                    freqMap.put(dominantChar, (freqMap.get(dominantChar) ?: 0) + 1)
-                }
-                while(right < s.length - 1 && (charactersLeftToTransform > 0 || (freqMap.get(s[right + 1]) ?: 0) == (freqMap.get(dominantChar) ?: 0))) { //Growing the sliding window with nondominant characters
+                if(charactersLeftToTransform >= 0) {
+                    while(right < s.length - 1 && s[right + 1] == dominantChar) { //Grow the sliding window to as much as possible using the dominant char
+                        right++
+                        freqMap.put(dominantChar, (freqMap.get(dominantChar) ?: 0) + 1)
+                    }
+                    while(right < s.length - 1 && (charactersLeftToTransform > 0 || (freqMap.get(s[right + 1]) ?: 0) == (freqMap.get(dominantChar) ?: 0))) { //Growing the sliding window with nondominant characters 
                         right++
                         freqMap.put(s[right], (freqMap.getOrPut(s[right], {0}) as Int) + 1)
                         charactersLeftToTransform--
@@ -51,22 +53,19 @@ class Solution {
                         charactersAdded++
                     }
                 }
+            }
             if(right - left + 1 > maxLength) maxLength = right - left + 1
             // println("Can't add more, shrink by 1")
             freqMap.put(s[left], (freqMap.get(s[left]) ?: 0) - 1)
-            if((freqMap.get(s[left]) ?: 0) <= 0) freqMap.remove(s[left])
-            if(left == right) {
-                right++
-                if(right < s.length) freqMap.put(s[right], freqMap.getOrPut(s[right], {0}) + 1)
-            }
+            if(right < s.length - 1) freqMap.put(s[right + 1], freqMap.getOrPut(s[right + 1], {0}) + 1)
             freqMap.forEach { entry ->
                 if(entry.value > (freqMap.get(dominantChar) ?: 0)) {
                     dominantChar = entry.key
                 }
             }
-            // println(freqMap)
             left++
-            if(right == s.length - 1) return maxLength
+            right++
+            if(right >= s.length - 1) return maxLength
         }
         return maxLength
     }
