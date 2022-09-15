@@ -12,15 +12,17 @@ class Solution {
             
             Each cell in the array will be true/false depending on if a zero exists on that row or column --> O(m + n) space
         */
-        val rowArray = BooleanArray(matrix.size) {false}
-        val colArray = BooleanArray(matrix[0].size) {false}
+        var firstColumnHasZero = false
+        var firstRowHasZero = false
         
         //Iterate through the matrix, populating row/colArray
         matrix.forEachIndexed { rowIndex, row ->
             row.forEachIndexed { colIndex, value ->
                 if(value == 0) {
-                    rowArray[rowIndex] = true
-                    colArray[colIndex] = true
+                    if(colIndex == 0) firstColumnHasZero = true
+                    if(rowIndex == 0) firstRowHasZero = true
+                    matrix[rowIndex][0] = 0
+                    matrix[0][colIndex] = 0
                 }
             }
         }
@@ -28,8 +30,16 @@ class Solution {
         //Interate through the matrix again, this time setting values if they are on the same row/column as a zero
         matrix.forEachIndexed { rowIndex, row ->
             row.forEachIndexed { colIndex, value ->
-                if(rowArray[rowIndex] == true || colArray[colIndex] == true) matrix[rowIndex][colIndex] = 0
+                if(rowIndex > 0 && colIndex > 0) {
+                    if(matrix[rowIndex][0] == 0 || matrix[0][colIndex] == 0) matrix[rowIndex][colIndex] = 0
+                }
             }
+        }
+        if(firstRowHasZero == true) { //We don't know if any 0 in the first row/col is a flag or not, so keep a boolean and fill spaces.
+            matrix[0].forEachIndexed { colIndex, value ->  matrix[0][colIndex] = 0 }
+        }
+        if(firstColumnHasZero == true) {
+            matrix.forEachIndexed { rowIndex, row -> row[0] = 0 }
         }
     }
 }
