@@ -12,7 +12,7 @@ class Solution {
             O(logX) time, O(logX) space, where X is the original integer
         */
         if((x >= 0 && x < 10) || (x > -10 && x < 0)) return x
-        val digitsList = mutableListOf<Int>()
+        val digitsList = LinkedList<Int>()
         val sign = if(x > 0) 1 else -1
         if(x == Integer.MIN_VALUE) return 0 //Corner case - we can't process MIN_VALUE normally at all
         var currentNumber = Math.abs(x)
